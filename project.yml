@@ -5,7 +5,7 @@ targets:
   LocProofApp:
     type: application
     platform: iOS
-    deploymentTarget: "15.0"
+    deploymentTarget: "17.0"
     sources: [LocProofApp]
     info:
       path: LocProofApp/Info.plist
@@ -19,7 +19,7 @@ targets:
   LocProofTunnel:
     type: app-extension
     platform: iOS
-    deploymentTarget: "15.0"
+    deploymentTarget: "17.0"
     sources: [LocProofTunnel]
     info:
       path: LocProofTunnel/Info.plist
