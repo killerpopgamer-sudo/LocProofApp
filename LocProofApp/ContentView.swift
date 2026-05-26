@@ -3,12 +3,10 @@ import MapKit
 import NetworkExtension
 
 struct ContentView: View {
-    // Default map position centered on a fallback location
-    @State private var position: MapCameraPosition = .region(
-        MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 45.5017, longitude: -73.5673),
-            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-        )
+    // Default map region for iOS 16 compatibility
+    @State private var region = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 45.5017, longitude: -73.5673),
+        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     
     @State private var targetCoordinate = CLLocationCoordinate2D(latitude: 45.5017, longitude: -73.5673)
@@ -18,16 +16,24 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
-            // Full-Screen Interactive Map
-            Map(position: $position) {
-                Marker("Target Location", coordinate: targetCoordinate)
-                    .tint(.blue)
+            // Full-Screen Interactive Map (iOS 16 compatible)
+            ZStack {
+                Map(coordinateRegion: $region)
+                    .onChange(of: region.center.latitude) { _ in
+                        // Updates target pin location visually when map is dragged
+                        targetCoordinate = region.center
+                    }
+                    .onChange(of: region.center.longitude) { _ in
+                        targetCoordinate = region.center
+                    }
+                    .ignoresSafeArea()
+                
+                // Overlay Center Pin
+                Image(systemName: "mappin.circle.fill")
+                    .font(.largeTitle)
+                    .foregroundColor(.blue)
+                    .padding(.bottom, 35) // visually point to exact center
             }
-            .onMapCameraChange { context in
-                // Updates target pin as the user drags the map
-                targetCoordinate = context.region.center
-            }
-            .ignoresSafeArea()
             
             // Top Control Overlay: Speed and Mode
             VStack {
@@ -118,6 +124,9 @@ struct ContentView: View {
         
         targetCoordinate.latitude += latChange
         targetCoordinate.longitude += lonChange
+        
+        // Also update map region visually
+        region.center = targetCoordinate
         
         // Update the active tunnel server configuration variables dynamically
         VPNManager.shared.updateCoordinates(lat: targetCoordinate.latitude, lon: targetCoordinate.longitude)
