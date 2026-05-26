@@ -1,0 +1,27 @@
+name: Build IPA
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install XcodeGen
+      run: brew install xcodegen
+    - name: Generate Xcode Project
+      run: xcodegen generate
+    - name: Build unsigned IPA
+      run: |
+        xcodebuild -project LocProofApp.xcodeproj -scheme LocProofApp -configuration Release -sdk iphoneos clean archive -archivePath build/LocProofApp.xcarchive CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY=""
+        cd build/LocProofApp.xcarchive/Products/Applications
+        mkdir Payload
+        mv LocProofApp.app Payload/
+        zip -r LocProofApp.ipa Payload
+        mv LocProofApp.ipa ../../../../
+    - name: Upload IPA Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: LocProofApp-IPA
+        path: LocProofApp.ipa

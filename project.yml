@@ -1,0 +1,27 @@
+name: LocProofApp
+options:
+  bundleIdPrefix: com.locproof
+targets:
+  LocProofApp:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources: [LocProofApp]
+    info:
+      path: LocProofApp/Info.plist
+      properties:
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+          UISceneConfigurations: {}
+    dependencies:
+      - target: LocProofTunnel
+  LocProofTunnel:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources: [LocProofTunnel]
+    info:
+      path: LocProofTunnel/Info.plist
+    settings:
+      EXCLUDED_ARCHS: ""
